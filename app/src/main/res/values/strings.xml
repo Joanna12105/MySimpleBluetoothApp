@@ -7,6 +7,7 @@
     <string name="ConnectedDummyText">"Gekoppelte Geräte wurde gedrückt"</string>
     <string name="SearchDummyText">"Starte Suche wurde gedrückt"</string>
 
+    <string name="btNotAvailable">"Kein Bluetooth verfügbar!"</string>
 
 
 </resources>
