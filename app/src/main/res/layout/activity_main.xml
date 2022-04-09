@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/ConnectedDevicesButton"
+        android:id="@+id/PairedDevicesButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="25dp"
@@ -29,11 +29,11 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ListView
-        android:id="@+id/ConnectedDevicesListView"
+        android:id="@+id/PairedDevicesListView"
         android:layout_width="match_parent"
         android:layout_height="400dp"
         android:layout_marginBottom="50dp"
-        app:layout_constraintBottom_toTopOf="@+id/ConnectedDevicesButton"
+        app:layout_constraintBottom_toTopOf="@+id/PairedDevicesButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
