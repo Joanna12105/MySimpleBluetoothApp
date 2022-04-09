@@ -2,7 +2,8 @@
     <string name="app_name">MySimpleBluetoothApp</string>
 
     <string name="ConnectedDevicesText">Gekoppelte Geräte</string>
-    <string name="searchBluetoothConnectionText">Starte Suche</string>
+    <string name="startSearchDevice">Start suche Geräte</string>
+    <string name="stopSearchDevice">Stopp suche Geräte</string>
 
     <string name="ConnectedDummyText">"Gekoppelte Geräte wurde gedrückt"</string>
     <string name="SearchDummyText">"Starte Suche wurde gedrückt"</string>
@@ -10,8 +11,6 @@
     <string name="btNotAvailable">"Kein Bluetooth verfügbar!"</string>
     <string name="btNoPairedDevices">Keine gekoppelten Geräte verfügbar!</string>
 
-    <string name="startSearchDevice">Start suche Geräte</string>
-    <string name="stopSearchDevice">Stopp suche Geräte</string>
 
 
 </resources>
