@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val adapter: ArrayAdapter<*> = ArrayAdapter(this,
-            R.layout.support_simple_spinner_dropdown_item,
+            androidx.constraintlayout.widget.R.layout.support_simple_spinner_dropdown_item,
             list)
         lvPairedDevices.adapter = adapter
     }
