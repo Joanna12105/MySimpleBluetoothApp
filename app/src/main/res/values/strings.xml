@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MySimpleBluetoothApp</string>
+
+    <string name="ConnectedDevicesText">Gekoppelte Geräte</string>
+    <string name="searchBluetoothConnectionText">Starte Suche</string>
+
+    <string name="ConnectedDummyText">"Gekoppelte Geräte wurde gedrückt"</string>
+    <string name="SearchDummyText">"Starte Suche wurde gedrückt"</string>
+
+
+
+</resources>
