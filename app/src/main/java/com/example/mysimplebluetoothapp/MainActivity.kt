@@ -1,6 +1,7 @@
 package com.example.mysimplebluetoothapp
 
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.ContentValues.TAG
 import android.content.Intent
@@ -33,13 +34,13 @@ class MainActivity : AppCompatActivity() {
 
         btnPairedDevices.setOnClickListener {
             Log.i(TAG, getString(R.string.ConnectedDummyText))
-            toast(getString(R.string.ConnectedDummyText))
             getPairedDevices()
         }
 
         btnBluetoothConnection.setOnClickListener {
             Log.i(TAG, getString(R.string.SearchDummyText))
-            toast(getString(R.string.SearchDummyText))
+            checkBTPermission()
+            getDiscoverDevices()
         }
 
     }
@@ -52,6 +53,11 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(turnBTOn, 1)
         }
     }
+
+
+
+
+
 
     private fun getPairedDevices() {
 
@@ -71,4 +77,31 @@ class MainActivity : AppCompatActivity() {
             list)
         lvPairedDevices.adapter = adapter
     }
+
+
+
+
+    private fun checkBTPermission() {
+        var permissionCheck = checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION")
+        permissionCheck += checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION")
+        if (permissionCheck != 0) {
+            requestPermissions(arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION), 1001)
+        }
+    }
+
+
+    private fun getDiscoverDevices() {
+        if(!mBluetooth.isDiscovering) { // Suche ist nicht gestartet
+            mBluetooth.startDiscovery();  // starte Suche
+            btnBluetoothConnection.text = getString(R.string.stopSearchDevice);
+        } else {                        // Suche ist gestartet
+            mBluetooth.cancelDiscovery(); // Stoppe suche
+            btnBluetoothConnection.text = getString(R.string.startSearchDevice);
+        }
+    }
+
+
+
 }
