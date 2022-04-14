@@ -3,8 +3,12 @@ package com.example.mysimplebluetoothapp
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val btnBluetoothConnection : Button by lazy { findViewById(R.id.searchBluetoothConnectionButton) }
     private val lvPairedDevices : ListView by lazy{ findViewById(R.id.PairedDevicesListView) }
 
+    private var discoveredDevices = arrayListOf<String>()
     private lateinit var mBluetooth: BluetoothAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getPairedDevices() {
 
-        val pairedDevices = mBluetooth!!.bondedDevices
+        val pairedDevices = mBluetooth.bondedDevices
         val list = ArrayList<Any>()
 
         if (pairedDevices.size > 0) {
@@ -95,11 +100,41 @@ class MainActivity : AppCompatActivity() {
     private fun getDiscoverDevices() {
         if(!mBluetooth.isDiscovering) { // Suche ist nicht gestartet
             mBluetooth.startDiscovery();  // starte Suche
+            val discoverDevicesIntent = IntentFilter(BluetoothDevice.ACTION_FOUND) //auf diese Signale soll unser Broadcast Receiver filtern
+            registerReceiver(mBroadcastReceiver, discoverDevicesIntent)
             btnBluetoothConnection.text = getString(R.string.stopSearchDevice);
         } else {                        // Suche ist gestartet
             mBluetooth.cancelDiscovery(); // Stoppe suche
+            unregisterReceiver(mBroadcastReceiver);
             btnBluetoothConnection.text = getString(R.string.startSearchDevice);
         }
+    }
+
+
+    private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val action = intent.action
+            if (action == BluetoothDevice.ACTION_FOUND) {
+                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                val deviceInfo = """${device!!.name}${device.address}""".trimIndent()
+                Log.i(TAG, deviceInfo)
+
+                // gefundenes Gerät der Liste hinzufügen, wenn es noch nicht aufgeführt ist
+                if (!discoveredDevices.contains(deviceInfo)) {
+                    discoveredDevices.add(deviceInfo)
+                }
+
+                // aktualisierte Liste im Listview anzeigen
+                val adapt = ArrayAdapter(applicationContext, android.R.layout.simple_list_item_1, discoveredDevices)
+                lvPairedDevices.adapter = adapt
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(mBroadcastReceiver)
+        mBluetooth.cancelDiscovery()
     }
 
 
