@@ -9,16 +9,17 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import splitties.toast.toast
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_ADDRESS = "device_address"
+    }
     private val btnPairedDevices : Button by lazy { findViewById(R.id.PairedDevicesButton) }
     private val btnBluetoothConnection : Button by lazy { findViewById(R.id.searchBluetoothConnectionButton) }
     private val lvPairedDevices : ListView by lazy{ findViewById(R.id.PairedDevicesListView) }
@@ -48,6 +49,26 @@ class MainActivity : AppCompatActivity() {
             getDiscoverDevices()
         }
 
+        lvPairedDevices.onItemClickListener = lvOnClickListener
+
+    }
+
+
+    private val lvOnClickListener = AdapterView.OnItemClickListener {
+            parent, view, position, id ->
+        // stoppe weitere Suche
+        if (mBluetooth?.isDiscovering) {
+            mBluetooth.cancelDiscovery()
+            unregisterReceiver(mBroadcastReceiver);
+        }
+        btnBluetoothConnection.text = getString(R.string.startSearchDevice);
+        // MAC Adresse des ausgewählten Devices an BTControl übergeben
+        val info = (view as TextView).text.toString()
+        val address = info.substring(info.length - 17)
+        toast (address)
+        val i = Intent(this@MainActivity, BTControl::class.java)
+        i.putExtra(EXTRA_ADDRESS, address)
+        startActivity(i)
     }
 
 

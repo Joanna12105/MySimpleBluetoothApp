@@ -6,8 +6,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <application
@@ -17,6 +15,9 @@
         android:roundIcon="@mipmap/bluetooth_symbol_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MySimpleBluetoothApp">
+        <activity
+            android:name=".BTControl"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
