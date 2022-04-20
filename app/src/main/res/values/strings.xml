@@ -11,5 +11,8 @@
     <string name="btNotAvailable">"Kein Bluetooth verfügbar!"</string>
     <string name="btNoPairedDevices">Keine gekoppelten Geräte verfügbar!</string>
 
+    <string name="connectFailed">Connection failed</string>
+    <string name="connectSuccess">Connected</string>
+
 
 </resources>
