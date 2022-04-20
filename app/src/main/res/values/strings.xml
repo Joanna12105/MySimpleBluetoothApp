@@ -13,6 +13,13 @@
 
     <string name="connectFailed">Connection failed</string>
     <string name="connectSuccess">Connected</string>
+    <string name="connectedTo">Verbunden mit %1$s</string>
+    <string name="ledOn">LED AN</string>
+    <string name="ledOff">LED AUS</string>
+    <string name="flashingOn">Blinken AN</string>
+    <string name="flashingOff">Blinken AUS</string>
+    <string name="dataStart">Daten empfangen</string>
+    <string name="dataStop">Datenempfang beenden</string>
 
 
 </resources>

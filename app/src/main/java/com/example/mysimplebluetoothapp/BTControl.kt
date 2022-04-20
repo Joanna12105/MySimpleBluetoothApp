@@ -1,6 +1,7 @@
 package com.example.mysimplebluetoothapp
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
@@ -16,14 +17,14 @@ import org.json.JSONObject
 import splitties.toast.toast
 import java.io.IOException
 import java.util.*
+import org.json.JSONArray
 
 class BTControl : AppCompatActivity() {
 
-
     private val TAG = "BTControl Activity"
 
-    private lateinit var address: String
-    private lateinit var value: String
+    private lateinit var address : String
+    private lateinit var value : String
     private var isConnected = false
     private var ledIsOn = false
     private var ledFlashing = false
@@ -34,10 +35,16 @@ class BTControl : AppCompatActivity() {
     private var mSocket: BluetoothSocket? = null
     private val mBluetooth: BluetoothAdapter by lazy { BluetoothAdapter.getDefaultAdapter() }
 
+
     val mUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
-    private val progress: ProgressBar by lazy { findViewById(R.id.progress) }
-
+    private val progress: ProgressBar by lazy{ findViewById(R.id.progress) }
+    private val txtConnection: TextView by lazy{ findViewById(R.id.textview_connected_to) }
+    private val btnLed: Button by lazy{ findViewById(R.id.button_led_status) }
+    private val btnData: Button by lazy{ findViewById(R.id.button_data) }
+    private val btnBlinken: Button by lazy{ findViewById(R.id.btnBlinken) }
+    private val tvData: TextView by lazy{ findViewById(R.id.textview_value_received) }
+    private val tvArray: TextView by lazy{ findViewById(R.id.tvArray) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +54,106 @@ class BTControl : AppCompatActivity() {
         address = newint.getStringExtra(MainActivity.EXTRA_ADDRESS).toString()
 
         ConnectBT().execute()
+
+        btnBlinken.setOnClickListener {
+            ledFlashing = !ledFlashing
+            val obj = JSONObject()
+            if(ledFlashing) {
+                obj.put("LEDBlinken", true)
+                btnBlinken.text = getString(R.string.flashingOff)
+            }else{
+                obj.put("LEDBlinken", false)
+                btnBlinken.text = getString(R.string.flashingOn)
+            }
+            obj.put("LED", if (ledIsOn) "H" else "L")
+            sendBTMessage("!" + obj.toString() + "?")
+        }
+
+        btnLed.setOnClickListener {
+            ledIsOn = !ledIsOn
+            val obj = JSONObject()
+            if (ledIsOn) {
+                obj.put("LED", "H")
+                btnLed.text = getString(R.string.ledOff)
+            } else {
+                obj.put("LED", "L")
+                btnLed.text = getString(R.string.ledOn)
+            }
+            obj.put("LEDBlinken", ledFlashing)
+            sendBTMessage("!" + obj.toString() + "?")
+        }
+
+        btnData.setOnClickListener {
+            receivingData = !receivingData
+            if (receivingData) dataStart() else dataStop()
+        }
     }
 
+    private fun dataStart() {
+        if (!isConnected) return
+        if (!receivingData) return
+        btnData.text = getString(R.string.dataStop)
+        // starte Handler-Runnable zum Lesen des Buffers
+        mRunnable = Runnable {
+            mHandler.postDelayed(mRunnable, 1000)
+            readBuffer()
+        }
+        mHandler.postDelayed(mRunnable, 1000)
+    }
+
+    private fun dataStop() {
+        btnData.text = getString(R.string.dataStart)
+        if (mRunnable != null) mHandler.removeCallbacks(mRunnable)
+        receivingData = false
+    }
+
+
+    private fun readBuffer() {
+        try {
+            val mInputStream = mSocket!!.inputStream
+            val buffer = ByteArray(2048)
+            val bytes = mInputStream.read(buffer)
+            // buffer in String umwandeln
+            val jsonStrings = String(buffer, 0, bytes)
+            // an ! trennen
+            val singleJsonStrings = jsonStrings.split("!")
+            // jeden einzelnen getrennten String betrachten
+            singleJsonStrings.forEach { jsonstring ->
+                // Endet der String mit ?
+                if (jsonstring.endsWith("?"))
+                // dann entferne das Fragezeichen und Werte den JSON String aus
+                    parseJSONData(jsonstring.dropLast(1))
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.d(TAG, e.localizedMessage!!)
+        }
+    }
+
+    private fun parseJSONData(jsonString : String) {
+        try {
+            //response String zu einem JSON Objekt
+            val obj = JSONObject(jsonString)
+            //val ledstatus = obj.getString("ledstatus")
+            tvData.text = obj.getString("ledstatus")
+
+            //Array Ausgabe
+            val potiArray = obj.getJSONArray("potiArray")
+            tvArray.text = potiArray.toString()
+        } catch (e : JSONException) {
+            e.printStackTrace()
+        }
+    }
+
+
+    private fun sendBTMessage(send: String) {
+        try {
+            mSocket!!.outputStream.write(send.toByteArray())
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.d(TAG, e.localizedMessage!!)
+        }
+    }
 
     private inner class ConnectBT : AsyncTask<Void, Void, Void>() {
         private var connectSuccess = true
@@ -74,6 +179,24 @@ class BTControl : AppCompatActivity() {
             return null
         }
 
+        override fun onPostExecute(result: Void?) {
+            super.onPostExecute(result)
 
+            if (!connectSuccess) {
+                toast(getString(R.string.connectFailed))
+                finish()
+            } else {
+                toast(getString(R.string.connectSuccess))
+                isConnected = true
+                txtConnection.text = getString(R.string.connectedTo, address)
+            }
+            progress.visibility = View.GONE
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dataStop()
+        mSocket?.close()
     }
 }

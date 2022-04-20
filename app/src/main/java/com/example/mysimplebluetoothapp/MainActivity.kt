@@ -121,29 +121,13 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun getDiscoverDevices() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED
-        )
-            /*{
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        } */
-
         if(!mBluetooth.isDiscovering) { // Suche ist nicht gestartet
-            mBluetooth.startDiscovery();  // starte Suche
+            mBluetooth.startDiscovery()  // starte Suche
             val discoverDevicesIntent = IntentFilter(BluetoothDevice.ACTION_FOUND) //auf diese Signale soll unser Broadcast Receiver filtern
             registerReceiver(mBroadcastReceiver, discoverDevicesIntent)
             btnBluetoothConnection.text = getString(R.string.stopSearchDevice);
         } else {                        // Suche ist gestartet
-            mBluetooth.cancelDiscovery(); // Stoppe suche
+            mBluetooth.cancelDiscovery() // Stoppe suche
             unregisterReceiver(mBroadcastReceiver);
             btnBluetoothConnection.text = getString(R.string.startSearchDevice);
         }
