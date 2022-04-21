@@ -19,6 +19,8 @@ import splitties.toast.toast
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity"
+
     companion object {
         const val EXTRA_ADDRESS = "device_address"
     }
